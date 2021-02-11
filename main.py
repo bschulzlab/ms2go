@@ -4,7 +4,10 @@
 #os.environ["R_HOME"] = r""
 #os.environ["path"] = r"C:\Users\localadmin\Anaconda3;C:\Users\localadmin\Anaconda3\Scripts;C:\Users\localadmin\Anaconda3\Library\bin;C:\Users\localadmin\Anaconda3\Library\mingw-w64\lib;C:\Users\localadmin\Anaconda3\Library\mingw-w64\bin;" + os.environ["path"]
 import os
-os.environ["R_HOME"] = r"C:\Program Files\R\R-3.6.3"
+import settings
+
+if settings.R_HOME:
+    os.environ["R_HOME"] = settings.R_HOME
 
 import argparse
 import msstats
@@ -23,9 +26,9 @@ parser.add_argument("-i",
                          "control", dest="i")
 
 
-msstats_pvalue_cutoff = 0.00001
-gostats_pvalue_cutoff = 0.01
-gostats_check = True
+msstats_pvalue_cutoff = settings.msstats_cutoff
+gostats_pvalue_cutoff = settings.gostats_cutoff
+gostats_check = settings.gostats_check
 
 
 def get_uniprot_data(msstats):

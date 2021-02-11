@@ -6,6 +6,7 @@ import subprocess
 import pandas as pd
 import rpy2.robjects as ro
 import os
+import settings
 
 def recurList(data):
     rDictTypes = [DataFrame, ListVector]
@@ -107,7 +108,7 @@ def process_msstats(filename):
 
     for i, d in work.groupby(["ion", "fdr", "out"]):
         pathlib.Path(i[2]).mkdir(parents=True, exist_ok=True)
-        ms = MSstats(i[0], i[1], i[2], "reformatMS_windows_amd64.exe")
+        ms = MSstats(i[0], i[1], i[2], settings.Reformat_MSstats)
 
         comparisons = []
         for i2, r in d.iterrows():
