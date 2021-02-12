@@ -1,8 +1,8 @@
-##MS2GO
+# MS2GO
 
 This is a Python, Go and R pipelines for analysis of PeakView data.
 
-##Note
+# Note
 `rpy2`, a Python package necessary for R and Python communication, can be tricky to install on Windows.
 In order to get it installed, you first have to make sure that the R binary that you want to run is in windows environmental variable `PATH`.
 
