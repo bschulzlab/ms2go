@@ -28,3 +28,9 @@ The program accepts one argument, "-i" which is a tabulated `.txt` file with 5 c
 - out: output folder location. A `/` should be added at the end of the folder path if it does not have it. A new folder would be created in the folder path if the folder does not exist.
 - treatment: treatment condition id. Assuming the sample labels are `condtion_replicate`.
 - control: control condition id. Assuming the sample labels are `condtion_replicate`.
+
+Operation example:
+
+The tabulated file is `work.txt`
+
+`python main.py -i work.txt`
