@@ -30,6 +30,61 @@ msstats_pvalue_cutoff = settings.msstats_cutoff
 gostats_pvalue_cutoff = settings.gostats_cutoff
 gostats_check = settings.gostats_check
 
+def split_base(work):
+    work = pd.read_csv(work, sep="\t")
+    new_work = []
+    for i, r in work.iterrows():
+        r["out"] = r["out"].rstrip("/")
+        #print(r["out"])
+        #if ";" in r["control"] or ";" in r["treatment"]:
+        control = r["control"].split(";")
+        treatment = r["treatment"].split(";")
+        control_dict = {}
+        treatment_dict = {}
+        ion = pd.read_csv(r["ion"])
+        # ind = ""
+        # for c in ion.columns:
+        #    if "MANND_3" in c:
+        #        ind = c
+        #ion = ion.drop(ind, axis=1)
+        fdr = pd.read_csv(r["fdr"], dtype={"Decoy": str})
+        #fdr = fdr.drop(ind, axis=1)
+        # keep = []
+        for c in ion.columns[9:]:
+            for con in control:
+                if con in c:
+                    # keep.append(c)
+                    if con not in control_dict:
+                        control_dict[con] = []
+                    control_dict[con].append(c)
+            for tre in treatment:
+                if tre in c:
+                    # keep.append(c)
+                    if tre not in treatment_dict:
+                        treatment_dict[tre] = []
+                    treatment_dict[tre].append(c)
+        # print(keep)
+        # keep_ion = list(ion.columns[:9]) + keep
+        # keep_fdr = list(fdr.columns[:7]) + keep
+        for t in treatment_dict:
+            for c in control_dict:
+
+                ion_new_name = r["ion"] + "{}vs{}.csv".format(t, c)
+                fdr_new_name = r["fdr"] + "{}vs{}.csv".format(t, c)
+                keep = list(ion.columns[:9]) + treatment_dict[t] + control_dict[c]
+                #print(keep)
+                ion_new = ion[keep]
+                # ion["Protein"] = ion["Protein"].str.replace("CSL", "P00740")
+                ion_new.to_csv(ion_new_name, index=False)
+                keep = list(fdr.columns[:7]) + treatment_dict[t] + control_dict[c]
+                fdr_new = fdr[keep]
+                # fdr["Protein"] = fdr["Protein"].str.replace("CSL", "P00740")
+                fdr_new.to_csv(fdr_new_name, index=False)
+                new_work.append([ion_new_name, fdr_new_name, r["out"] + "/{}vs{}".format(t, c) + "/", t, c])
+        #else:
+            #new_work.append(r)
+    df = pd.DataFrame(new_work, columns=["ion", "fdr", "out", "treatment", "control"])
+    df.to_csv("workextt.txt", index=False, sep="\t")
 
 def get_uniprot_data(msstats):
     for i, r in msstats.iterrows():
@@ -73,7 +128,11 @@ def perform_gostats(association, universe, study):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    for i, ms in msstats.process_msstats(args.i):
+    workfile_path = args.i
+    if settings.split:
+        split_base(workfile_path)
+        workfile_path = "workextt.txt"
+    for i, ms in msstats.process_msstats(workfile_path):
         uniprot_data = get_uniprot_data(ms)
         uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)
         if gostats_check:
