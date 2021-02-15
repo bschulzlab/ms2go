@@ -98,7 +98,7 @@ class MSstats:
         else:
             self.run_r_code('''comparison<-comparison0''')
         self.run_r_code('''row.names(comparison)<-c({})'''.format(",".join(comparison_dataframe["comparison_name"])))
-        self.run_r_code('''testResultMultiComparisons<-groupComparison(contrast.matrix=comparison,data=quant,labeled=FALSE)''')
+        self.run_r_code('''testResultMultiComparisons<-groupComparison(contrast.matrix=comparison,data=quant,labeled=FALSE,interference=FALSE,featureVar=TRUE)''')
         self.run_r_code('''write.csv(testResultMultiComparisons$ComparisonResult, "{}")'''.format(self.out+"_msstats.csv"))
         return pd.read_csv(self.out+"_msstats.csv", index_col=0)
 
