@@ -129,6 +129,8 @@ def perform_gostats(association, universe, study):
 if __name__ == "__main__":
     args = parser.parse_args()
     workfile_path = args.i
+    if not workfile_path:
+        workfile_path = settings.work
     if settings.split:
         split_base(workfile_path)
         workfile_path = "workextt.txt"
