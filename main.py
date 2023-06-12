@@ -14,9 +14,8 @@ import msstats
 import gostats
 import pandas as pd
 from io import StringIO
-from get_uniprot import UniprotParser, UniprotSequence
 import csv
-
+from uniprotparser.betaparser import UniprotParser, UniprotSequence
 
 parser = argparse.ArgumentParser(description="Automated workflow for processing PeakView data through MSstats and GOstats")
 parser.add_argument("-i",
@@ -91,10 +90,9 @@ def get_uniprot_data(msstats):
         seq = UniprotSequence(r["Protein"], True)
         msstats.at[i, "Accession"] = str(seq)
     accessions = msstats["Accession"].unique()
-    parser = UniprotParser(accessions, True)
-
+    parser = UniprotParser()
     data = []
-    for i in parser.parse("tab"):
+    for i in parser.parse(accessions):
         frame = pd.read_csv(StringIO(i), sep="\t")
         frame = frame.rename(columns={frame.columns[-1]: "Accession"})
         data.append(frame)
@@ -113,11 +111,11 @@ def create_go_association_file(data, output_file):
         writer = csv.writer(outfile, dialect="excel", delimiter="\t")
         writer.writerow(["Geneontology IDs", "Gocode", "Entry"])
         for i, r in data.iterrows():
-            if pd.notnull(r["Gene ontology IDs"]):
-                go_ids = r["Gene ontology IDs"].split("; ")
+            if pd.notnull(r["Gene Ontology IDs"]):
+                go_ids = r["Gene Ontology IDs"].split("; ")
                 if go_ids:
                     for g in go_ids:
-                        writer.writerow([g, "IEA", r["Entry name"]])
+                        writer.writerow([g, "IEA", r["Entry Name"]])
 
 
 def perform_gostats(association, universe, study):
@@ -143,10 +141,10 @@ if __name__ == "__main__":
 
                 pvalue_cut_ms = g[g["adj.pvalue"] <= msstats_pvalue_cutoff]
                 increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left", on=["Accession"])
-                increase_set = increase_set[pd.notnull(increase_set["Gene ontology IDs"])]
+                increase_set = increase_set[pd.notnull(increase_set["Gene Ontology IDs"])]
                 increase_set.to_csv(i[2]+ind+"increase.txt", sep="\t", index=False)
                 decrease_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] < 0], uniprot_data, how="left", on=["Accession"])
-                decrease_set = decrease_set[pd.notnull(decrease_set["Gene ontology IDs"])]
+                decrease_set = decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])]
                 decrease_set.to_csv(i[2]+ind+"decrease.txt", sep="\t", index=False)
 
                 create_go_association_file(combined_msstats_uniprot, i[2]+ind+"gostats_association.txt")
