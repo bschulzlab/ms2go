@@ -6,6 +6,11 @@ The workflow would start by reading a tabulated `txt` file that define the locat
 
 If `GOstats` analysis is allowed to be performed, the `MSstats` dataset would first be cutoff at the set P-value then split into those that were found to be upregulated and downregulated. For each of these datasets, we performed `GOstats` on them separately for 3 pathways, `Molecullar functions`, `Cellular components`, and `Biological processes`. The output would automatically have its P-value adjusted by FDR BH and Bonferronni methods. 
 
+## Installation
+Installation of all the necessary packages can be done by. The packages have been tested with Python 3.11
+
+`pip install -r requirements.txt`
+
 ## Note
 `rpy2`, a Python package necessary for R and Python communication, can be tricky to install on Windows.
 In order to get it installed, you first have to make sure that the R binary that you want to run is in windows environmental variable `PATH`.

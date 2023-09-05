@@ -9,6 +9,9 @@ readme = "README.md"
 python = "^3.11"
 pandas = "^2.0.2"
 uniprotparser = "^1.1.0"
+rpy2 = "^3.5.14"
+statsmodels = "^0.14.0"
+numpy = "^1.25.2"
 
 
 [build-system]

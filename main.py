@@ -94,9 +94,12 @@ def get_uniprot_data(msstats):
     data = []
     for i in parser.parse(accessions):
         frame = pd.read_csv(StringIO(i), sep="\t")
-        frame = frame.rename(columns={frame.columns[-1]: "Accession"})
+        frame = frame.rename(columns={"From": "Accession"})
         data.append(frame)
-    data = pd.concat(data, ignore_index=True)
+    if len(data) == 1:
+        data = data[0]
+    else:
+        data = pd.concat(data, ignore_index=True)
     unmatched = []
     for a in accessions:
         if a not in data["Accession"].values:
