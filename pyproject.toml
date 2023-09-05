@@ -6,7 +6,7 @@ authors = ["Toan Phung <toan.phungkhoiquoctoan@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.9,<4.0"
 pandas = "^2.0.2"
 uniprotparser = "^1.1.0"
 rpy2 = "^3.5.14"
