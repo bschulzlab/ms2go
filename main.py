@@ -150,17 +150,17 @@ if __name__ == "__main__":
                 decrease_set = decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])]
                 decrease_set.to_csv(i[2]+ind+"decrease.txt", sep="\t", index=False)
 
-                create_go_association_file(combined_msstats_uniprot, i[2]+ind+"gostats_association.txt")
+                create_go_association_file(combined_msstats_uniprot, i[2]+ind[0]+"gostats_association.txt")
                 result_increase = perform_gostats(
-                    i[2]+ind+"gostats_association.txt",
+                    i[2]+ind[0]+"gostats_association.txt",
                     i[2]+"_uniprot.txt",
-                    i[2]+ind+"increase.txt"
+                    i[2]+ind[0]+"increase.txt"
                 )
-                result_increase.to_csv(i[2]+ind+"gostats_increase.txt", sep="\t", index=False)
+                result_increase.to_csv(i[2]+ind[0]+"gostats_increase.txt", sep="\t", index=False)
                 result_decrease = perform_gostats(
-                    i[2] + ind + "gostats_association.txt",
+                    i[2] + ind[0] + "gostats_association.txt",
                     i[2] + "_uniprot.txt",
-                    i[2] + ind + "decrease.txt"
+                    i[2] + ind[0] + "decrease.txt"
                 )
-                result_decrease.to_csv(i[2] + ind + "gostats_decrease.txt", sep="\t", index=False)
+                result_decrease.to_csv(i[2] + ind[0] + "gostats_decrease.txt", sep="\t", index=False)
 
