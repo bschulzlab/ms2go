@@ -68,8 +68,8 @@ class GOStats:
             para = '''params<-GSEAGOHyperGParams(
             name="My params",
             geneSetCollection=gsc,
-            geneIds=study$Entry.name,
-            universeGeneIds=universe$Entry.name,
+            geneIds=study$Entry.Name,
+            universeGeneIds=universe$Entry.Name,
             pvalueCutoff=1,
             testDirection="over",
             ontology="{}",
