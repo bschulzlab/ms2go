@@ -145,10 +145,10 @@ if __name__ == "__main__":
                 pvalue_cut_ms = g[g["adj.pvalue"] <= msstats_pvalue_cutoff]
                 increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left", on=["Accession"])
                 increase_set = increase_set[pd.notnull(increase_set["Gene Ontology IDs"])]
-                increase_set.to_csv(i[2]+ind+"increase.txt", sep="\t", index=False)
+                increase_set.to_csv(i[2]+ind[0]+"increase.txt", sep="\t", index=False)
                 decrease_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] < 0], uniprot_data, how="left", on=["Accession"])
                 decrease_set = decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])]
-                decrease_set.to_csv(i[2]+ind+"decrease.txt", sep="\t", index=False)
+                decrease_set.to_csv(i[2]+ind[0]+"decrease.txt", sep="\t", index=False)
 
                 create_go_association_file(combined_msstats_uniprot, i[2]+ind[0]+"gostats_association.txt")
                 result_increase = perform_gostats(
