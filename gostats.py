@@ -28,11 +28,11 @@ class GOStats:
 
     def __init__(self, association_file, universe_file, study_file, organism, association_file_delimiter="\t", universe_delimiter="\t", study_delimiter="\t", pvalue_cutoff=0.001):
         self.pvalue_cutoff = pvalue_cutoff
-        self.association_file = association_file
+        self.association_file = association_file.replace("\\", "/")
         self.association_file_delimiter = association_file_delimiter
-        self.universe_file = universe_file
+        self.universe_file = universe_file.replace("\\", "/")
         self.universe_delimiter = universe_delimiter
-        self.study_file = study_file
+        self.study_file = study_file.replace("\\", "/")
         self.study_delimiter = study_delimiter
         self.organism = organism
         self.code_source = []
@@ -49,11 +49,12 @@ class GOStats:
     def initiate_gostats(self):
         self.run_r_code('''library(GOstats)''')
         self.run_r_code('''library(GSEABase)''')
-        build_GO = '''GODB<-read.csv("{}", sep="{}")'''.format(self.association_file, self.association_file_delimiter)
+        build_GO = '''GODB<-read.table("{}", sep="{}", header=TRUE)'''.format(self.association_file, self.association_file_delimiter)
+        print(build_GO)
         self.run_r_code(build_GO)
-        universe = '''universe<-read.csv("{}", sep="{}")'''.format(self.universe_file, self.universe_delimiter)
+        universe = '''universe<-read.table("{}", sep="{}", header=TRUE)'''.format(self.universe_file, self.universe_delimiter)
         self.run_r_code(universe)
-        study = '''study<-read.csv("{}", sep="{}")'''.format(self.study_file, self.study_delimiter)
+        study = '''study<-read.table("{}", sep="{}", header=TRUE)'''.format(self.study_file, self.study_delimiter)
         self.run_r_code(study)
 
     def process(self):

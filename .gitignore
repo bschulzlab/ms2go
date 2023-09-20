@@ -121,3 +121,4 @@ dmypy.json
 *.csv
 data/
 *.R
+_BHG_vs_BCG/.Rhistory
