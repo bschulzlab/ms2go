@@ -1,0 +1,21 @@
+version: "3.5"
+services:
+  rstudio:
+    environment:
+      - USER=toan
+      - PASSWORD=21021992
+    image: "rocker/tidyverse:3.6.3-ubuntu18.04"
+    volumes:
+      - ./data:/home/toan/R_and_Jupyter_scripts
+    container_name: rstudio-ms2go
+    ports:
+      - "8787:8787"
+
+#  jupyter:
+#    image: 'jupyter/datascience-notebook:latest'
+#    ports:
+#      - 8888:8888
+#    volumes:
+#      - /tmp/R_and_Jupyter_scripts:/home/jovyan/R_and_Jupyter_scripts
+#    working_dir: /home/jovyan/R_and_Jupyter_scripts
+#    container_name: jupyter
