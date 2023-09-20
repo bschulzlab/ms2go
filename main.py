@@ -138,10 +138,9 @@ if __name__ == "__main__":
     for i, ms in msstats.process_msstats(workfile_path):
         uniprot_data = get_uniprot_data(ms)
         uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)
-        if gostats_check:
+        if gostats_check and uniprot_data[pd.notnull(uniprot_data["Gene Ontology IDs"])].shape[0] > 0:
             for ind, g in ms.groupby(["Label"]):
                 combined_msstats_uniprot = pd.merge(ms, uniprot_data, how="left", on=["Accession"])
-
                 pvalue_cut_ms = g[g["adj.pvalue"] <= msstats_pvalue_cutoff]
                 increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left", on=["Accession"])
                 increase_set = increase_set[pd.notnull(increase_set["Gene Ontology IDs"])]
@@ -151,16 +150,22 @@ if __name__ == "__main__":
                 decrease_set.to_csv(i[2]+ind[0]+"decrease.txt", sep="\t", index=False)
 
                 create_go_association_file(combined_msstats_uniprot, i[2]+ind[0]+"gostats_association.txt")
-                result_increase = perform_gostats(
-                    i[2]+ind[0]+"gostats_association.txt",
-                    i[2]+"_uniprot.txt",
-                    i[2]+ind[0]+"increase.txt"
-                )
-                result_increase.to_csv(i[2]+ind[0]+"gostats_increase.txt", sep="\t", index=False)
-                result_decrease = perform_gostats(
-                    i[2] + ind[0] + "gostats_association.txt",
-                    i[2] + "_uniprot.txt",
-                    i[2] + ind[0] + "decrease.txt"
-                )
-                result_decrease.to_csv(i[2] + ind[0] + "gostats_decrease.txt", sep="\t", index=False)
+                if increase_set[pd.notnull(increase_set["Gene Ontology IDs"])].shape[0] > 0:
+                    result_increase = perform_gostats(
+                        i[2]+ind[0]+"gostats_association.txt",
+                        i[2]+"_uniprot.txt",
+                        i[2]+ind[0]+"increase.txt"
+                    )
+                    result_increase.to_csv(i[2]+ind[0]+"gostats_increase.txt", sep="\t", index=False)
+                else:
+                    print("No GOIDs found for increase set")
+                if decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])].shape[0] > 0:
+                    result_decrease = perform_gostats(
+                        i[2] + ind[0] + "gostats_association.txt",
+                        i[2] + "_uniprot.txt",
+                        i[2] + ind[0] + "decrease.txt"
+                    )
+                    result_decrease.to_csv(i[2] + ind[0] + "gostats_decrease.txt", sep="\t", index=False)
+                else:
+                    print("No GOIDs found for decrease set")
 

@@ -52,9 +52,15 @@ class GOStats:
         build_GO = '''GODB<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")'''.format(self.association_file, self.association_file_delimiter)
         print(build_GO)
         self.run_r_code(build_GO)
-        universe = '''universe<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")'''.format(self.universe_file, self.universe_delimiter)
+        universe = '''
+        universe<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")
+        universe$Entry.Name<-as.character(universe$Entry.Name)
+        '''.format(self.universe_file, self.universe_delimiter)
         self.run_r_code(universe)
-        study = '''study<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")'''.format(self.study_file, self.study_delimiter)
+        study = '''
+        study<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")
+        study$Entry.Name<-as.character(study$Entry.Name)
+        '''.format(self.study_file, self.study_delimiter)
         self.run_r_code(study)
 
     def process(self):
@@ -97,10 +103,13 @@ class GOStats:
                 s_py["Pvalue_" + m] = p_corrected
             result.append(s_py)
         if not result:
+            ro.r('''rm(list = ls(all.names = TRUE))''')
             print("No matches were found for GOstats analysis")
         else:
             self.write_r_source()
+            ro.r('''rm(list = ls(all.names = TRUE))''')
             return pd.concat(result, ignore_index=True)
+
 
 
 
