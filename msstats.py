@@ -126,6 +126,7 @@ def process_msstats(filename):
             result = ms.process_comparisons(com_df)
             ms.write_r_source()
             yield i, result
+        ro.r('''rm(list = ls(all.names = TRUE))''')
 
 if __name__ == "__main__":
     in_file = "work2.txt"
