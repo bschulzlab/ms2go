@@ -49,12 +49,12 @@ class GOStats:
     def initiate_gostats(self):
         self.run_r_code('''library(GOstats)''')
         self.run_r_code('''library(GSEABase)''')
-        build_GO = '''GODB<-read.table("{}", sep="{}", header=TRUE)'''.format(self.association_file, self.association_file_delimiter)
+        build_GO = '''GODB<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")'''.format(self.association_file, self.association_file_delimiter)
         print(build_GO)
         self.run_r_code(build_GO)
-        universe = '''universe<-read.table("{}", sep="{}", header=TRUE)'''.format(self.universe_file, self.universe_delimiter)
+        universe = '''universe<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")'''.format(self.universe_file, self.universe_delimiter)
         self.run_r_code(universe)
-        study = '''study<-read.table("{}", sep="{}", header=TRUE)'''.format(self.study_file, self.study_delimiter)
+        study = '''study<-read.table("{}", sep="{}", header=TRUE, fill=TRUE, comment.char = "")'''.format(self.study_file, self.study_delimiter)
         self.run_r_code(study)
 
     def process(self):
