@@ -7,10 +7,10 @@ WORKDIR /app
 RUN apt-get update
 RUN apt-get install libnetcdf-dev wget r-base-dev=3.6.3-2 -y
 RUN apt-get install cmake -y
-
+COPY . /app
 RUN R -e 'install.packages("BiocManager", repos = "https://cloud.r-project.org/")'
 RUN R -e 'BiocManager::install("MSstats")'
-
+RUN cp -r /app/MSstats /usr/local/lib/R/site-library
 RUN R -e 'BiocManager::install("mzR")'
 RUN R -e 'BiocManager::install("reshaper")'
 RUN R -e 'BiocManager::install("XML")'
