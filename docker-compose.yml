@@ -1,15 +1,13 @@
 version: "3.5"
 services:
-  rstudio:
-    environment:
-      - USER=toan
-      - PASSWORD=21021992
-    image: "rocker/tidyverse:3.6.3-ubuntu18.04"
+  ms2go:
+    build:
+        context: .
+        dockerfile: Dockerfile
     volumes:
-      - ./data:/home/toan/R_and_Jupyter_scripts
-    container_name: rstudio-ms2go
-    ports:
-      - "8787:8787"
+      - ./data:/data
+    container_name: ms2go
+    command: bash
 
 #  jupyter:
 #    image: 'jupyter/datascience-notebook:latest'

@@ -138,7 +138,10 @@ if __name__ == "__main__":
     for i, ms in msstats.process_msstats(workfile_path):
         uniprot_data = get_uniprot_data(ms)
         uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)
-        if gostats_check and uniprot_data[pd.notnull(uniprot_data["Gene Ontology IDs"])].shape[0] > 0:
+        uniprot_data = uniprot_data[["Entry", "Gene Ontology IDs"]]
+        uniprot_data = uniprot_data[pd.notnull(uniprot_data["Gene Ontology IDs"])]
+        uniprot_data.to_csv(i[2]+"_universe.txt", "\t", index=False)
+        if gostats_check and uniprot_data.shape[0] > 0:
             for ind, g in ms.groupby(["Label"]):
                 combined_msstats_uniprot = pd.merge(ms, uniprot_data, how="left", on=["Accession"])
                 pvalue_cut_ms = g[g["adj.pvalue"] <= msstats_pvalue_cutoff]
