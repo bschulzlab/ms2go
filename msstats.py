@@ -111,27 +111,45 @@ class MSstats:
 def process_msstats(filename):
     work = pd.read_csv(filename, sep="\t")
 
-    for i, d in work.groupby(["ion", "fdr", "out"]):
-        pathlib.Path(i[2]).mkdir(parents=True, exist_ok=True)
-        ms = MSstats(i[0], i[1], i[2], settings.Reformat_MSstats)
+    # process input data in parallel using multiprocessing pool of 6
+    from multiprocessing import Pool
 
+    with Pool(settings.msstats_parallel) as p:
+        data = p.map(process_msstats_worker, work.groupby(["ion", "fdr", "out"]))
+
+        for i, r in data:
+            if r is not None:
+                yield i, r
+
+
+
+def process_msstats_worker(group_data):
+    i = group_data[0]
+    d = group_data[1]
+    pathlib.Path(i[2]).mkdir(parents=True, exist_ok=True)
+    if not os.path.exists(i[2] + "/reformated.csv"):
+        ms = MSstats(i[0], i[1], i[2], settings.Reformat_MSstats)
         comparisons = []
         for i2, r in d.iterrows():
             comp = {}
             comp["treatment"] = r["treatment"].split(";")
             comp["control"] = r["control"].split(";")
             comparisons.append(comp)
-
         ms.reformat_ms()
         ms.get_levels()
         if not ms.levels:
-            raise ValueError("No samples can be used for comparison.")
+            print("No samples can be used for comparison.")
+            return i, None
         else:
             com_df = ms.generate_comparisons(comparisons)
             result = ms.process_comparisons(com_df)
             ms.write_r_source()
-            yield i, result
-        ro.r('''rm(list = ls(all.names = TRUE))''')
+            return i, result
+    else:
+        print("Already analyzed: {}".format(i[2]))
+        return i, pd.read_csv(i[2]+"reformated.csv_msstats.csv", index_col=0)
+    # ro.r('''rm(list = ls(all.names = TRUE))''')
+
 
 if __name__ == "__main__":
     in_file = "work2.txt"

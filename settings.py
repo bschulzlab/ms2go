@@ -6,3 +6,4 @@ msstats_cutoff = 0.00001
 gostats_cutoff = 0.01
 gostats_check = True
 docker = False
+msstats_parallel = 4

@@ -1,3 +1,4 @@
+import rpy2.rinterface_lib.embedded
 from rpy2.robjects.vectors import DataFrame, FloatVector, ListVector, IntVector, StrVector
 import numpy as np
 import rpy2.robjects as ro
@@ -72,36 +73,39 @@ class GOStats:
         gsc = '''gsc<-GeneSetCollection(gaf,setType=GOCollection())'''
         self.run_r_code(gsc)
         for o in self._ontology:
-            para = '''params<-GSEAGOHyperGParams(
-            name="My params",
-            geneSetCollection=gsc,
-            geneIds=study$Entry.Name,
-            universeGeneIds=universe$Entry.Name,
-            pvalueCutoff=1,
-            testDirection="over",
-            ontology="{}",
-            conditional=FALSE)'''.format(o)
-            print(para)
-            self.run_r_code(para)
-            proc = '''Over<-hyperGTest(params)'''
-            self.run_r_code(proc)
-            go_genes= '''geneIdsByCategory(Over)'''
-            g = self.run_r_code(go_genes)
-            g_py = recurList(g)
-            summary_res = '''summary(Over)'''
-            s = self.run_r_code(summary_res)
-            s_py = pd.DataFrame(recurList(s))
-            s_py["Ontology"] = pd.Series([o]*len(s_py.index), index=s_py.index)
-            s_py = s_py.rename(columns={"GO"+o+"ID": "GOID"})
-            for i, r in s_py.iterrows():
-                if r["GOID"] in g_py:
-                    s_py.at[i, "Proteins"] = ";".join(g_py[r["GOID"]])
-            s_py = s_py.sort_values("Pvalue")
-            for m in self._methods:
-                r, p_corrected, als, alb = multipletests(s_py["Pvalue"].values, self.pvalue_cutoff, is_sorted=True,
-                                                         method=m)
-                s_py["Pvalue_" + m] = p_corrected
-            result.append(s_py)
+            try:
+                para = '''params<-GSEAGOHyperGParams(
+                name="My params",
+                geneSetCollection=gsc,
+                geneIds=study$Entry.Name,
+                universeGeneIds=universe$Entry.Name,
+                pvalueCutoff=1,
+                testDirection="over",
+                ontology="{}",
+                conditional=FALSE)'''.format(o)
+                print(para)
+                self.run_r_code(para)
+                proc = '''Over<-hyperGTest(params)'''
+                self.run_r_code(proc)
+                go_genes= '''geneIdsByCategory(Over)'''
+                g = self.run_r_code(go_genes)
+                g_py = recurList(g)
+                summary_res = '''summary(Over)'''
+                s = self.run_r_code(summary_res)
+                s_py = pd.DataFrame(recurList(s))
+                s_py["Ontology"] = pd.Series([o]*len(s_py.index), index=s_py.index)
+                s_py = s_py.rename(columns={"GO"+o+"ID": "GOID"})
+                for i, r in s_py.iterrows():
+                    if r["GOID"] in g_py:
+                        s_py.at[i, "Proteins"] = ";".join(g_py[r["GOID"]])
+                s_py = s_py.sort_values("Pvalue")
+                for m in self._methods:
+                    r, p_corrected, als, alb = multipletests(s_py["Pvalue"].values, self.pvalue_cutoff, is_sorted=True,
+                                                             method=m)
+                    s_py["Pvalue_" + m] = p_corrected
+                result.append(s_py)
+            except rpy2.rinterface_lib.embedded.RRuntimeError as e:
+                print(e)
         if not result:
             ro.r('''rm(list = ls(all.names = TRUE))''')
             print("No matches were found for GOstats analysis")

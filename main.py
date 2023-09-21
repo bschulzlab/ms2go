@@ -5,9 +5,11 @@
 #os.environ["path"] = r"C:\Users\localadmin\Anaconda3;C:\Users\localadmin\Anaconda3\Scripts;C:\Users\localadmin\Anaconda3\Library\bin;C:\Users\localadmin\Anaconda3\Library\mingw-w64\lib;C:\Users\localadmin\Anaconda3\Library\mingw-w64\bin;" + os.environ["path"]
 import os
 import settings
-
+from multiprocessing import Pool
 if settings.R_HOME:
-    os.environ["R_HOME"] = settings.R_HOME
+    # check if os is linux
+    if os.name != "posix":
+        os.environ["R_HOME"] = settings.R_HOME
 
 import argparse
 import msstats
@@ -136,19 +138,25 @@ if __name__ == "__main__":
         split_base(workfile_path)
         workfile_path = "workextt.txt"
     for i, ms in msstats.process_msstats(workfile_path):
-        uniprot_data = get_uniprot_data(ms)
-        uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)
-        uniprot_data = uniprot_data[["Entry", "Gene Ontology IDs"]]
+        ms = ms[ms["log2FC"] != "NA"]
+        if not os.path.exists(i[2]+"_uniprot.txt"):
+            uniprot_data = get_uniprot_data(ms)
+            uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)
+        else:
+            uniprot_data = pd.read_csv(i[2]+"_uniprot.txt", sep="\t")
         uniprot_data = uniprot_data[pd.notnull(uniprot_data["Gene Ontology IDs"])]
         uniprot_data.to_csv(i[2]+"_universe.txt", "\t", index=False)
         if gostats_check and uniprot_data.shape[0] > 0:
             for ind, g in ms.groupby(["Label"]):
-                combined_msstats_uniprot = pd.merge(ms, uniprot_data, how="left", on=["Accession"])
+                print("Running GOstats for " + ind[0])
+
+                combined_msstats_uniprot = g.merge(uniprot_data, how="left", left_on=["Protein"], right_on=[uniprot_data.columns[0]])
+
                 pvalue_cut_ms = g[g["adj.pvalue"] <= msstats_pvalue_cutoff]
-                increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left", on=["Accession"])
+                increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left", left_on=["Protein"], right_on=[uniprot_data.columns[0]])
                 increase_set = increase_set[pd.notnull(increase_set["Gene Ontology IDs"])]
                 increase_set.to_csv(i[2]+ind[0]+"increase.txt", sep="\t", index=False)
-                decrease_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] < 0], uniprot_data, how="left", on=["Accession"])
+                decrease_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] < 0], uniprot_data, how="left", left_on=["Protein"], right_on=[uniprot_data.columns[0]])
                 decrease_set = decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])]
                 decrease_set.to_csv(i[2]+ind[0]+"decrease.txt", sep="\t", index=False)
 
@@ -156,7 +164,7 @@ if __name__ == "__main__":
                 if increase_set[pd.notnull(increase_set["Gene Ontology IDs"])].shape[0] > 0:
                     result_increase = perform_gostats(
                         i[2]+ind[0]+"gostats_association.txt",
-                        i[2]+"_uniprot.txt",
+                        i[2]+"_universe.txt",
                         i[2]+ind[0]+"increase.txt"
                     )
                     result_increase.to_csv(i[2]+ind[0]+"gostats_increase.txt", sep="\t", index=False)
@@ -165,7 +173,7 @@ if __name__ == "__main__":
                 if decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])].shape[0] > 0:
                     result_decrease = perform_gostats(
                         i[2] + ind[0] + "gostats_association.txt",
-                        i[2] + "_uniprot.txt",
+                        i[2] + "_universe.txt",
                         i[2] + ind[0] + "decrease.txt"
                     )
                     result_decrease.to_csv(i[2] + ind[0] + "gostats_decrease.txt", sep="\t", index=False)

@@ -122,3 +122,4 @@ dmypy.json
 .data/
 ./*.R
 _BHG_vs_BCG/.Rhistory
+*.zip
