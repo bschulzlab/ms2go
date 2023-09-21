@@ -7,7 +7,6 @@ services:
     volumes:
       - ./data:/data
     container_name: ms2go
-    command: bash
 
 #  jupyter:
 #    image: 'jupyter/datascience-notebook:latest'

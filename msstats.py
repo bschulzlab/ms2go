@@ -47,10 +47,15 @@ class MSstats:
     
     def reformat_ms(self):
         print("Using {} for reformating file: {}".format(self.binary_path, self.ion))
-        reformat = subprocess.run(
-            [self.binary_path, "-ion", self.ion, "-fdr", self.fdr, "-out", self.out, "-t", str(self.cutoff)],
-            shell=True
-        )
+        if "linux" in self.binary_path:
+            reformat = subprocess.run(
+                [self.binary_path, "-ion", self.ion, "-fdr", self.fdr, "-out", self.out, "-t", str(self.cutoff)]
+            )
+        else:
+            reformat = subprocess.run(
+                [self.binary_path, "-ion", self.ion, "-fdr", self.fdr, "-out", self.out, "-t", str(self.cutoff)],
+                shell=True
+            )
         print(reformat.args)
         if reformat.returncode != 0:
             raise subprocess.CalledProcessError("Error reformatting input ion for MSstats.")
