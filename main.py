@@ -88,9 +88,7 @@ def split_base(work):
     df.to_csv("workextt.txt", index=False, sep="\t")
 
 def get_uniprot_data(msstats):
-    for i, r in msstats.iterrows():
-        seq = UniprotSequence(r["Protein"], True)
-        msstats.at[i, "Accession"] = str(seq)
+
     accessions = msstats["Accession"].unique()
     parser = UniprotParser()
     data = []
@@ -139,6 +137,9 @@ if __name__ == "__main__":
         workfile_path = "workextt.txt"
     for i, ms in msstats.process_msstats(workfile_path):
         ms = ms[ms["log2FC"] != "NA"]
+        for i, r in ms.iterrows():
+            seq = UniprotSequence(r["Protein"], True)
+            ms.at[i, "Accession"] = str(seq)
         if not os.path.exists(i[2]+"_uniprot.txt"):
             uniprot_data = get_uniprot_data(ms)
             uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)
