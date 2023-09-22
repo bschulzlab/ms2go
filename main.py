@@ -151,13 +151,13 @@ if __name__ == "__main__":
             for ind, g in ms.groupby(["Label"]):
                 print("Running GOstats for " + ind[0])
 
-                combined_msstats_uniprot = g.merge(uniprot_data, how="left", left_on=["Protein"], right_on=[uniprot_data.columns[0]])
+                combined_msstats_uniprot = g.merge(uniprot_data, how="left", on=["Accession"])
 
                 pvalue_cut_ms = g[g["adj.pvalue"] <= msstats_pvalue_cutoff]
-                increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left", left_on=["Protein"], right_on=[uniprot_data.columns[0]])
+                increase_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] > 0], uniprot_data, how="left",  on=["Accession"])
                 increase_set = increase_set[pd.notnull(increase_set["Gene Ontology IDs"])]
                 increase_set.to_csv(i[2]+ind[0]+"increase.txt", sep="\t", index=False)
-                decrease_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] < 0], uniprot_data, how="left", left_on=["Protein"], right_on=[uniprot_data.columns[0]])
+                decrease_set = pd.merge(pvalue_cut_ms[pvalue_cut_ms["log2FC"] < 0], uniprot_data, how="left",  on=["Accession"])
                 decrease_set = decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])]
                 decrease_set.to_csv(i[2]+ind[0]+"decrease.txt", sep="\t", index=False)
 
