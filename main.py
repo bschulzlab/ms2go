@@ -137,9 +137,9 @@ if __name__ == "__main__":
         workfile_path = "workextt.txt"
     for i, ms in msstats.process_msstats(workfile_path):
         ms = ms[ms["log2FC"] != "NA"]
-        for i, r in ms.iterrows():
+        for i2, r in ms.iterrows():
             seq = UniprotSequence(r["Protein"], True)
-            ms.at[i, "Accession"] = str(seq)
+            ms.at[i2, "Accession"] = str(seq)
         if not os.path.exists(i[2]+"_uniprot.txt"):
             uniprot_data = get_uniprot_data(ms)
             uniprot_data.to_csv(i[2]+"_uniprot.txt", "\t", index=False)

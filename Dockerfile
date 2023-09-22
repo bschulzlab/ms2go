@@ -6,12 +6,14 @@ ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
 RUN apt-get update
-RUN apt-get install libnetcdf-dev wget r-base-dev=3.6.3-2 libxml2-dev cmake -y
+RUN apt-get install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+RUN apt-get install libnetcdf-dev wget r-base-dev=3.6.3-2 libxml2-dev cmake  python3.9 python3.9-dev python3-pip  -y
 
 RUN R -e 'install.packages("BiocManager", repos = "https://cloud.r-project.org/")'
 RUN R -e 'BiocManager::install(version = "3.9", ask = FALSE)'
 RUN R -e 'BiocManager::install("MSstats")'
-RUN apt-get install
 RUN R -e 'BiocManager::install("mzR")'
 RUN R -e 'BiocManager::install("reshape")'
 RUN R -e 'BiocManager::install("XML")'
@@ -19,9 +21,7 @@ RUN R -e 'BiocManager::install("mzID")'
 RUN R -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/MALDIquant/MALDIquant_1.16.tar.gz")'
 RUN R -e 'BiocManager::install("MSnbase")'
 RUN R -e 'BiocManager::install("GOstats")'
-RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get install python3.9 python3.9-dev python3-pip -y
+
 COPY . /app
 RUN cp -r /app/MSstats /usr/local/lib/R/site-library
 RUN sed -i 's+C:\\Program Files\\R\\R-3.6.3+/usr/lib/R+g' /app/settings.py
