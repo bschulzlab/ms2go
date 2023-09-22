@@ -119,7 +119,7 @@ dmypy.json
 # Data
 *.txt
 *.csv
-.data/
+data/
 ./*.R
 _BHG_vs_BCG/.Rhistory
 *.zip
