@@ -162,22 +162,30 @@ if __name__ == "__main__":
                 decrease_set.to_csv(i[2]+ind[0]+"decrease.txt", sep="\t", index=False)
 
                 create_go_association_file(combined_msstats_uniprot, i[2]+ind[0]+"gostats_association.txt")
-                if increase_set[pd.notnull(increase_set["Gene Ontology IDs"])].shape[0] > 0:
-                    result_increase = perform_gostats(
-                        i[2]+ind[0]+"gostats_association.txt",
-                        i[2]+"_universe.txt",
-                        i[2]+ind[0]+"increase.txt"
-                    )
-                    result_increase.to_csv(i[2]+ind[0]+"gostats_increase.txt", sep="\t", index=False)
+                if not increase_set.empty:
+                    if increase_set[pd.notnull(increase_set["Gene Ontology IDs"])].shape[0] > 0:
+                        result_increase = perform_gostats(
+                            i[2]+ind[0]+"gostats_association.txt",
+                            i[2]+"_universe.txt",
+                            i[2]+ind[0]+"increase.txt"
+                        )
+                        if result_increase is not None:
+                            result_increase.to_csv(i[2]+ind[0]+"gostats_increase.txt", sep="\t", index=False)
+                    else:
+                        print("No GOIDs found for increase set")
                 else:
-                    print("No GOIDs found for increase set")
-                if decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])].shape[0] > 0:
-                    result_decrease = perform_gostats(
-                        i[2] + ind[0] + "gostats_association.txt",
-                        i[2] + "_universe.txt",
-                        i[2] + ind[0] + "decrease.txt"
-                    )
-                    result_decrease.to_csv(i[2] + ind[0] + "gostats_decrease.txt", sep="\t", index=False)
+                    print("No significant proteins found for " + ind[0])
+                if not decrease_set.empty:
+                    if decrease_set[pd.notnull(decrease_set["Gene Ontology IDs"])].shape[0] > 0:
+                        result_decrease = perform_gostats(
+                            i[2] + ind[0] + "gostats_association.txt",
+                            i[2] + "_universe.txt",
+                            i[2] + ind[0] + "decrease.txt"
+                        )
+                        if result_decrease is not None:
+                            result_decrease.to_csv(i[2] + ind[0] + "gostats_decrease.txt", sep="\t", index=False)
+                    else:
+                        print("No GOIDs found for decrease set")
                 else:
-                    print("No GOIDs found for decrease set")
+                    print("No significant proteins found for " + ind[0])
 

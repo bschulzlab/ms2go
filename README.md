@@ -8,8 +8,18 @@ If `GOstats` analysis is allowed to be performed, the `MSstats` dataset would fi
 
 ## Installation
 Installation of all the necessary packages can be done by. The packages have been tested with Python 3.11
+```bash
+pip install -r requirements.txt
+```
 
-`pip install -r requirements.txt`
+## Docker based installation
+
+A docker image containing all the necessary packages can be built using the following command from the root of this repository
+
+```bash
+docker build -t ms2go .
+```
+
 
 ## Note
 `rpy2`, a Python package necessary for R and Python communication, can be tricky to install on Windows.
@@ -24,7 +34,7 @@ R packages that the pipeline requires are `MSstats` 2.x and `GOstats`. If an `MS
 
 Within the folder, `settings.py` is used to for setting p-value cutoff for MSstats and GOstats analysis, as well as location of folder with R binary and the `reformatMSstats` program binary and whether or not the program should automatically perform GOstats analysis.
 
-## Usage
+## Usage non-docker
 
 The program accepts one argument, "-i" which is a tabulated `.txt` file with 5 columns, `ion`, `fdr`, `out`, `treatment`, `control`.
 
@@ -39,3 +49,14 @@ Operation example:
 The tabulated file is `work.txt`
 
 `python main.py -i work.txt`
+
+## Usage docker
+
+The program accepts one argument, "-i" which is a tabulated `.txt` file with 5 columns, `ion`, `fdr`, `out`, `treatment`, `control`.
+
+Create a folder to contain your input and output file from the docker container. In this example, we will use `work` folder.
+Place all your input files in the `work` folder. Create a `work.txt` file in the `work` folder with the following with the 5 columns above and for each of the `ion`, `fdr`, and `out` columns, the value should be the relative path to the `work` folder and prefix them with `/work/`.
+
+```bash
+docker run -it --rm -v $(pwd)/work:/data ms2go -i /work/work.txt
+```
